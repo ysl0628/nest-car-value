@@ -8,35 +8,52 @@ import {
   Patch,
   Post,
   Query,
+  Session,
+  UseInterceptors,
 } from '@nestjs/common';
+import { CurrentUserInterceptor } from 'src/interceptors/current-user.interceptor';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { AuthService } from './auth.service';
+import { CurrentUser } from './decorator/current-user.decorator';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserDto } from './dtos/user.dto';
+import { User } from './users.entity';
 import { UsersService } from './users.service';
 
-@Serialize(UserDto)
 @Controller('auth')
+@Serialize(UserDto)
+@UseInterceptors(CurrentUserInterceptor)
 export class UsersController {
   constructor(
     private usersService: UsersService,
     private authService: AuthService,
   ) {}
 
+  @Get('/currentUser')
+  currentUser(@CurrentUser() user: User) {
+    return user;
+  }
+
+  @Post('/signout')
+  signout(@Session() session: any) {
+    session.userId = null;
+  }
+
   @Post('/signup')
-  createUser(@Body() body: CreateUserDto) {
-    return this.authService.signup(body.email, body.password);
+  async createUser(@Body() body: CreateUserDto, @Session() session: any) {
+    const user = await this.authService.signup(body.email, body.password);
+    session.userId = user.id;
+    return user;
   }
 
   @Post('/signin')
-  signin(@Body() body: CreateUserDto) {
-    return this.authService.signin(body.email, body.password);
+  async signin(@Body() body: CreateUserDto, @Session() session: any) {
+    const user = await this.authService.signin(body.email, body.password);
+    session.userId = user.id;
+    return user;
   }
 
-  // @UseInterceptors(new SerializeInterceptor(UserDto))
-  // 以自定義的 decorator 代替
-  // @Serialize(UserDto)
   @Get('/:id')
   // 從 url 傳來的所有變數皆為 string，所以在傳入 service 時需轉換型別
   async findUser(@Param('id') id: string) {
