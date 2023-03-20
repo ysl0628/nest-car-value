@@ -18,7 +18,7 @@ Content-Type: application/json
 }
 
 ###
-PATCH http://localhost:3000/reports/21
+PATCH http://localhost:3000/reports/22
 Content-Type: application/json
 
 {
