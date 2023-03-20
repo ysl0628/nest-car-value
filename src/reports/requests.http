@@ -1,21 +1,26 @@
 ###
+
+GET http://localhost:3000/reports?make=tesla&model=model x&lng=0&lat=0&mileage=10000&year=2020
+
+
+###
 POST http://localhost:3000/reports
 Content-Type: application/json
 
 {
     "price": 890000,
-    "make": "toyota",
-    "model": "sienta",
-    "year": 2020,
+    "make": "tesla",
+    "model": "model x",
+    "year": 2023,
     "lng": 0,
     "lat": 0,
-    "mileage": 10000
+    "mileage": 30000
 }
 
 ###
-PATCH http://localhost:3000/reports/16
+PATCH http://localhost:3000/reports/21
 Content-Type: application/json
 
 {
-    "approved": false
+    "approved": true
 }
