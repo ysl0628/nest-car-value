@@ -36,3 +36,4 @@ lerna-debug.log*
 src/users/requests.http
 .env.development
 .env.production
+.env.test
