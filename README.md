@@ -1,73 +1,126 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+## 簡介
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+這是一個使用 NestJS、TypeORM 和 SQLite 資料庫建立的範例專案，主要目的是展示如何使用 NestJS 實現使用者權限管理和報表管理 API。
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 安裝
 
-## Description
+本專案使用 docker-compose.yaml 啟動，請確保主機有 docker 環境，如果是 Linux 環境則需要另外安裝 docker-compose 套件。而如果是 Windows、Mac 則只需要安裝 Docker Desktop 即可。
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+要安裝此專案，請按照以下步驟進行：
 
-## Installation
+1. clone 此專案：`git clone https://github.com/nest-car-value.git`
+2. 切換到專案目錄：`cd nest-car-value`
+3. 安裝相依套件：`docker compose up -d`
 
-```bash
-$ npm install
+## 使用環境及工具
+- Node.js v16.17.0
+- NestJS v9.0.0
+- TypeORM v0.3.12
+- SQLite3 v5.1.6
+
+## Restful API
+### 使用者 (users)
+| Method | API | 備註 |
+|---|---|---|
+| `GET` | /auth/currentUser | 取得目前登入使用者的資訊 |
+| `GET` | /auth | 取得所有使用者資訊 |
+| `GET` | /auth/:id | 取得指定 ID 的使用者資訊 |
+| `POST` | /auth/signout | 登出 |
+| `POST` | /auth/signup | 註冊 |
+| `POST` | /auth/signin | 登入 |
+| `DELETE` | /auth/:id | 刪除指定 ID 的使用者 |
+| `PATCH` | /auth/:id | 修改指定 ID 的使用者資訊 |
+### 報告 (reports)
+| Method | API | 備註 |
+|---|---|---|
+| `GET` | /reports | 取得所有報告 |
+| `POST` | /reports | 新增報告 |
+| `PATCH` | /reports/:id | 修改指定 ID 的報告資訊 |
+
+### 資料庫結構圖
+
+```mermaid
+erDiagram
+    User {
+        id             Number PK
+        name           String
+        email          String
+        image          String
+        admin          Boolean "default: true"
+        reports        Report[]
+    }
+
+    Report {
+        id             Number PK
+        price          Number
+        make           String
+        model          String
+        year           Number
+        lng            Number
+        lat            Number
+        mileage        Number
+        approved       Boolean "default: false"
+        user           User
+    }
+
+    User ||--o{ Report: has
+
 ```
 
-## Running the app
+## 資料夾結構圖
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+```
+├── app.controller.spec.ts
+├── app.controller.ts
+├── app.module.ts
+├── app.service.ts
+├── config
+│   └── typeorm.config.ts
+├── data-source.ts
+├── guards
+│   ├── admin.guard.ts
+│   └── auth.guard.ts
+├── interceptors
+│   └── serialize.interceptor.ts
+├── main.ts
+├── migrations
+│   └── 1679411878532-initial-schema.ts
+├── reports
+│   ├── dtos
+│   │   ├── approve-report.dto.ts
+│   │   ├── create-report.dto.ts
+│   │   ├── get-estimate.dto.ts
+│   │   └── report.dto.ts
+│   ├── reports.controller.spec.ts
+│   ├── reports.controller.ts
+│   ├── reports.entity.ts
+│   ├── reports.module.ts
+│   ├── reports.service.spec.ts
+│   ├── reports.service.ts
+│   └── requests.http
+└── users
+    ├── auth.service.ts
+    ├── decorator
+    │   └── current-user.decorator.ts
+    ├── dtos
+    │   ├── create-user.dto.ts
+    │   ├── update-user.dto.ts
+    │   └── user.dto.ts
+    ├── interceptors
+    │   └── current-user.interceptor.ts
+    ├── middlewares
+    │   └── current-user.middleware.ts
+    ├── requests.http
+    ├── users.controller.spec.ts
+    ├── users.controller.ts
+    ├── users.entity.ts
+    ├── users.module.ts
+    ├── users.service.spec.ts
+    └── users.service
 ```
 
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+## 作者
+藍奕欣
+[Github](https://github.com/ysl0628)<br>
+LinkedIn: [藍奕欣](https://www.linkedin.com/in/奕欣-藍-100371248/)<br>
+Email: yihsinlan@gmail.com
